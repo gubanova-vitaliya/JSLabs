@@ -81,9 +81,7 @@ mark {
   cursor: pointer;
 }
 
-body {
-background-image: url('C:/Vitaliya/XML/фон.jpg');
-}
+
 .details-content {
 display: none;
 background-color: #4CAF50; /* Зеленый цвет */
