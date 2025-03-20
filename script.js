@@ -56,50 +56,39 @@ window.onload = function(){
     document.getElementById("btn_op_clear").onclick = function() { 
         a = ''
         b = ''
-        selectedOperation = null
-        expressionResult = 0
+        selectedOperation = ''
+        expressionResult = ''
         outputElement.innerHTML = 0
     }
     
     // кнопка расчёта результата
     document.getElementById("btn_op_equal").onclick = function() { 
-        if (a === '' && expressionResult === 0) // изменено для накопления
+        if (a === '' || b === '' || !selectedOperation)
             return
-    
-        let numA = parseFloat(a || 0)  //изменено для накопления
-        let numB = parseFloat(b || 0)   //изменено для накопления
-    
-        switch(selectedOperation) {
+            
+        switch(selectedOperation) { 
             case 'x':
-                expressionResult = (expressionResult || 1) * numB  //изменено для накопления
+                expressionResult = (+a) * (+b)
                 break;
             case '+':
-                expressionResult = (expressionResult || 0) + numB  //изменено для накопления
+                expressionResult = (+a) + (+b)
                 break;
             case '-':
-                expressionResult = (expressionResult || numA) - numB  //изменено для накопления
+                expressionResult = (+a) - (+b)
                 break;
             case '/':
-                if (numB === 0) {
-                    outputElement.innerHTML = "Ошибка: Деление на ноль!";
-                    return;
-                }
-                 expressionResult = (expressionResult || numA) / numB  //изменено для накопления
-                break;
-            default: // для первого ввода числа
-                expressionResult = numA  //изменено для накопления
+                expressionResult = (+a) / (+b)
                 break;
         }
-    
-        a = ''
+        
+        a = expressionResult.toString()
         b = ''
         selectedOperation = null
     
-        outputElement.innerHTML = expressionResult.toString()
+        outputElement.innerHTML = a
     }
-};
-    //////////////Запрограммируйте операцию смены знака +/-;
-    document.getElementById("btn_op_sign").onclick = function() {
+     //////////////Запрограммируйте операцию смены знака +/-;
+     document.getElementById("btn_op_sign").onclick = function() {
         if (!selectedOperation) {
             if (a === '') return; // Ничего не делать, если 'a' пустое
             a = (parseFloat(a) * -1).toString(); // Преобразуем в число, меняем знак, обратно в строку
@@ -131,8 +120,8 @@ window.onload = function(){
             outputElement.innerHTML = b;
         }
     }
-    //////// Добавьте кнопку стирания введенной цифры назад (backspace). Расположить кнопку можно, например, на месте нерабочих +/- и % кнопок;
-    document.getElementById("btn_op_backspace").onclick = function() {
+     //////// Добавьте кнопку стирания введенной цифры назад (backspace). Расположить кнопку можно, например, на месте нерабочих +/- и % кнопок;
+     document.getElementById("btn_op_backspace").onclick = function() {
         if (!selectedOperation) {
             a = a.slice(0, -1); // Удаляем последний символ из 'a'
             outputElement.innerHTML = a || 0; // Отображаем 'a', или 0, если 'a' пустое
@@ -171,8 +160,8 @@ window.onload = function(){
             outputElement.innerHTML = b;
         }
     }
-    //////////////Запрограммируйте операцию возведения в квадрат x²
-    document.getElementById("btn_op_square").onclick = function() {
+     //////////////Запрограммируйте операцию возведения в квадрат x²
+     document.getElementById("btn_op_square").onclick = function() {
         if (!selectedOperation) {
             if (a === '') return;
     
@@ -220,5 +209,42 @@ window.onload = function(){
             b += "000";
             outputElement.innerHTML = b;
         }
-    };
+    }
 
+      // Добавляем переменную для хранения накапливаемого значения
+let accumulatedValue = 0;
+
+// Обработчик для накапливаемого сложения
+document.getElementById("btn_accumulate_add").onclick = function() {
+  if (a !== '') {
+    accumulatedValue += parseFloat(a);
+    outputElement.innerHTML = accumulatedValue;
+    a = ''; // Сбрасываем текущее значение
+  }
+}
+
+// Обработчик для накапливаемого вычитания
+document.getElementById("btn_accumulate_sub").onclick = function() {
+  if (a !== '') {
+    accumulatedValue -= parseFloat(a);
+    outputElement.innerHTML = accumulatedValue;
+    a = ''; // Сбрасываем текущее значение
+  }
+}
+document.getElementById("btn_op_bits").onclick = function () {
+    try {
+      const alphabetSize = parseFloat(outputElement.innerText);
+
+      if (isNaN(alphabetSize) || alphabetSize <= 0) {
+        outputElement.innerText = "Error: Invalid alphabet size";
+        return;
+      }
+
+      const bits = Math.ceil(Math.log2(alphabetSize));
+      outputElement.innerText = bits;
+    } catch (error) {
+      outputElement.innerText = "Error";
+    }
+  }
+
+}
