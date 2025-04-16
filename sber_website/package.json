@@ -1,5 +1,13 @@
 {
+  "name": "sberbank-website",
+  "version": "1.0.0",
+  "description": "Сайт Сбербанка с акциями",
+  "scripts": {
+    "start": "serve ."
+  },
   "dependencies": {
-    "bootstrap": "^5.3.5"
-  }
+    "bootstrap": "^5.3.0",
+    "serve": "^14.2.0"
+  },
+  "type": "module"
 }
