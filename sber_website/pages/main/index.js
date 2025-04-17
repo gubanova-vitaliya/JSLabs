@@ -20,12 +20,26 @@ export class MainPage {
                 id: 2,
                 title: "Кэшбэк до 30%",
                 description: "Вернем деньги за покупки",
-                image: "https://cdn-icons-png.flaticon.com/512/3132/3132693.png",
+                image: "https://cdn-icons-png.flaticon.com/512/2553/2553629.png", // НОВАЯ КАРТИНКА
                 details: "Условия получения максимального кэшбэка"
+            },
+            // НОВЫЕ КАРТОЧКИ
+            {
+                id: 3,
+                title: "Инвестиции",
+                description: "Начните инвестировать от 1000₽",
+                image: "https://cdn-icons-png.flaticon.com/512/2721/2721614.png",
+                details: "Портфель под ваши цели с аналитикой рисков"
+            },
+            {
+                id: 4,
+                title: "Ипотека 5%",
+                description: "Льготные условия для семей",
+                image: "https://cdn-icons-png.flaticon.com/512/2489/2489756.png",
+                details: "Специальная ставка для семей с детьми"
             }
         ];
     }
-
     getDemoTransactions() {
         return [
             {category: "Кафе", amount: 500},
