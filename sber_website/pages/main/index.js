@@ -1,113 +1,254 @@
-import { ProductCardComponent } from '../../components/product-card/index.js';
-import { DetailsPage } from '../details/index.js';
-
 export class MainPage {
     constructor() {
         this.root = document.getElementById('app');
-        this.data = this.getData();
-        this.nextId = this.data.length + 1;
+        this.products = this.getProducts();
+        this.transactions = this.getDemoTransactions();
+        this.loginHistory = '110111011111101110';
+        this.render();
     }
 
-    getData() {
+    getProducts() {
         return [
             {
                 id: 1,
-                src: "https://cdn-icons-png.flaticon.com/512/196/196578.png",
                 title: "СберПрайм",
-                text: "Подписка на лучшие условия по кредитам и вкладам",
-                details: "СберПрайм — это подписка, которая дает вам особые условия по кредитам, вкладам и другим финансовым продуктам."
+                description: "Подписка на лучшие условия",
+                image: "https://cdn-icons-png.flaticon.com/512/196/196578.png",
+                details: "Полный список привилегий для подписчиков"
             },
             {
                 id: 2,
-                src: "https://cdn-icons-png.flaticon.com/512/3132/3132693.png",
                 title: "Кэшбэк до 30%",
-                text: "Вернем деньги за покупки у партнеров",
-                details: "Получайте кэшбэк до 30% при оплате картой Сбербанка у наших партнеров."
-            },
-            {
-                id: 3,
-                src: "https://cdn-icons-png.flaticon.com/512/2489/2489756.png",
-                title: "Ипотека 5%",
-                text: "Льготная ипотека для семей с детьми",
-                details: "Специальная ипотечная программа для семей с детьми по ставке от 5% годовых."
-            },
-            {
-                id: 4,
-                src: "https://cdn-icons-png.flaticon.com/512/2721/2721614.png",
-                title: "Инвестиции",
-                text: "Начните инвестировать от 1000 рублей",
-                details: "Платформа для инвестиций с минимальным порогом входа и обучающими материалами."
-            },
-            {
-                id: 5,
-                src: "https://cdn-icons-png.flaticon.com/512/2583/2583344.png",
-                title: "Страхование",
-                text: "Защита для вас и вашей семьи",
-                details: "Различные программы страхования жизни, здоровья и имущества."
-            },
-            {
-                id: 6,
-                src: "https://cdn-icons-png.flaticon.com/512/2553/2553629.png",
-                title: "Бизнес онлайн",
-                text: "Все для предпринимателей",
-                details: "Комплексные решения для бизнеса: расчётный счёт, эквайринг, кредиты."
+                description: "Вернем деньги за покупки",
+                image: "https://cdn-icons-png.flaticon.com/512/3132/3132693.png",
+                details: "Условия получения максимального кэшбэка"
             }
         ];
     }
 
-    deleteCard(id) {
-        this.data = this.data.filter(item => item.id !== id);
-        this.renderCards();
+    getDemoTransactions() {
+        return [
+            {category: "Кафе", amount: 500},
+            {category: "Супермаркет", amount: 3500},
+            {category: "Кафе", amount: 700},
+            {category: "Транспорт", amount: 2000},
+            {category: "Супермаркет", amount: 4200},
+            {category: "Аптека", amount: 800}
+        ];
     }
 
-    showDetails(data) {
-        this.root.innerHTML = '';
-        const detailsPage = new DetailsPage(data, () => this.render());
-        detailsPage.render();
+    // 1. Функция анализа повторяющихся операций
+    countIdentic(arr, key) {
+        const counts = {};
+        arr.forEach(item => counts[item[key]] = (counts[item[key]] || 0) + 1);
+        return Object.entries(counts)
+                   .filter(([_, count]) => count > 1)
+                   .map(([category, count]) => `${category}: ${count} раза`);
     }
 
-    addNewCard() {
-        if (this.data.length === 0) return;
-        
-        const lastCard = this.data[this.data.length - 1];
-        const newCard = {
-            ...lastCard,
-            id: this.nextId++,
-            title: `${lastCard.title} (копия)`
-        };
-        
-        this.data.push(newCard);
-        this.renderCards();
+    // 2. Среднее арифметическое
+    calculateAverage(arr, key) {
+        const sum = arr.reduce((acc, item) => acc + item[key], 0);
+        return (sum / arr.length).toFixed(2);
     }
 
-    renderCards() {
-        const pageRoot = document.getElementById('main-page');
-        pageRoot.innerHTML = '';
-        
-        this.data.forEach((item) => {
-            const productCard = new ProductCardComponent(
-                pageRoot, 
-                (id) => this.deleteCard(id),
-                (data) => this.showDetails(data)
-            );
-            productCard.render(item);
-        });
+    // 3. Максимальная последовательность 1
+    maxSuccessSequence(logs) {
+        return Math.max(...logs.split('0').map(s => s.length));
+    }
+
+    // 4. Проверка палиндрома (2 варианта)
+    isPalindrome(input) {
+        const str = String(input).replace(/\s/g, '');
+        return str === str.split('').reverse().join('');
     }
 
     render() {
         this.root.innerHTML = `
-            <div class="d-flex justify-content-end mb-3">
-                <button id="add-card-btn" class="btn btn-primary">Добавить карточку</button>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-between mb-4">
+                        <h2><i class="bi bi-percent"></i> Специальные предложения</h2>
+                        <button id="add-product-btn" class="btn btn-sber">
+                            <i class="bi bi-plus-circle"></i> Добавить
+                        </button>
+                    </div>
+                    <div id="products-container" class="row"></div>
+                </div>
+                
+                <div class="col-md-4">
+                    <h2 class="mb-4"><i class="bi bi-graph-up"></i> Аналитика</h2>
+                    
+                    <div class="analytics-card">
+                        <h5><i class="bi bi-repeat"></i> Повторяющиеся расходы</h5>
+                        <div id="repeat-transactions" class="my-2"></div>
+                        <small class="text-muted">Анализ последних операций</small>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h5><i class="bi bi-calculator"></i> Средний чек</h5>
+                        <div id="average-check" class="my-2"></div>
+                        <small class="text-muted">По всем категориям</small>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h5><i class="bi bi-shield-lock"></i> Активность</h5>
+                        <div id="login-streak" class="my-2"></div>
+                        <small class="text-muted">Последовательные входы</small>
+                    </div>
+                    
+                    <div class="palindrome-checker mt-3">
+                        <h5><i class="bi bi-credit-card"></i> Проверка карты</h5>
+                        <p>Является ли номер вашей карты палиндромом?</p>
+                        
+                        <div class="input-group mb-2">
+                            <input type="text" id="card-number-input" class="form-control" 
+                                   placeholder="Введите номер карты">
+                            <button id="check-palindrome-btn" class="btn btn-light">
+                                <i class="bi bi-check-circle"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="palindrome-result" class="alert" style="display:none"></div>
+                    </div>
+                </div>
             </div>
-            <div id="main-page" class="d-flex flex-wrap justify-content-center"></div>
         `;
-        
-        this.renderCards();
-        
-        document.getElementById('add-card-btn').addEventListener('click', () => {
-            this.addNewCard();
+
+        this.renderProducts();
+        this.renderAnalytics();
+        this.setupEventListeners();
+    }
+
+    renderProducts() {
+        const container = document.getElementById('products-container');
+        container.innerHTML = '';
+
+        this.products.forEach(product => {
+            const html = `
+                <div class="col-md-6" id="product-${product.id}">
+                    <div class="card product-card">
+                        <img src="${product.image}" class="card-img-top" alt="${product.title}">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.title}</h5>
+                            <p class="card-text">${product.description}</p>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-sber details-btn" data-id="${product.id}">
+                                    <i class="bi bi-info-circle"></i> Подробнее
+                                </button>
+                                <button class="btn btn-danger delete-btn" data-id="${product.id}">
+                                    <i class="bi bi-trash"></i> Удалить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
         });
     }
 
-    
+    renderAnalytics() {
+        // 1. Повторяющиеся операции
+        const repeats = this.countIdentic(this.transactions, 'category');
+        document.getElementById('repeat-transactions').innerHTML = 
+            repeats.length ? repeats.join('<br>') : 'Нет повторяющихся операций';
+        
+        // 2. Средний чек
+        const avgCheck = this.calculateAverage(this.transactions, 'amount');
+        document.getElementById('average-check').textContent = `${avgCheck} ₽`;
+        
+        // 3. Последовательные входы
+        const maxStreak = this.maxSuccessSequence(this.loginHistory);
+        document.getElementById('login-streak').innerHTML = `
+            <span class="badge bg-success">Рекорд: ${maxStreak}</span>
+        `;
+    }
+
+    setupEventListeners() {
+        // Добавление продукта
+        document.getElementById('add-product-btn').addEventListener('click', () => {
+            if (this.products.length === 0) return;
+            
+            const lastProduct = this.products[this.products.length - 1];
+            const newProduct = {
+                ...lastProduct,
+                id: this.products.length + 1,
+                title: `${lastProduct.title} (копия)`
+            };
+            
+            this.products.push(newProduct);
+            this.renderProducts();
+        });
+
+        // Удаление продукта
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const productId = parseInt(e.target.dataset.id);
+                this.products = this.products.filter(p => p.id !== productId);
+                document.getElementById(`product-${productId}`).remove();
+            });
+        });
+
+        // Подробнее о продукте
+        document.querySelectorAll('.details-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const productId = parseInt(e.target.dataset.id);
+                const product = this.products.find(p => p.id === productId);
+                this.showProductDetails(product);
+            });
+        });
+
+        // Проверка палиндрома
+        document.getElementById('check-palindrome-btn').addEventListener('click', () => {
+            const cardNumber = document.getElementById('card-number-input').value.replace(/\s/g, '');
+            const resultDiv = document.getElementById('palindrome-result');
+            
+            if (!cardNumber) {
+                resultDiv.textContent = 'Введите номер карты';
+                resultDiv.className = 'alert alert-warning';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            if (this.isPalindrome(cardNumber)) {
+                resultDiv.innerHTML = `
+                    <strong>Поздравляем!</strong> Ваша карта с номером ${cardNumber} 
+                    является палиндромом! <br>
+                    <a href="#" class="alert-link text-white">Узнайте о специальных условиях</a>
+                `;
+                resultDiv.className = 'alert alert-light';
+            } else {
+                resultDiv.textContent = `Номер ${cardNumber} не является палиндромом`;
+                resultDiv.className = 'alert alert-light';
+            }
+            
+            resultDiv.style.display = 'block';
+        });
+    }
+
+    showProductDetails(product) {
+        this.root.innerHTML = `
+            <div class="details-page">
+                <div class="card border-0">
+                    <img src="${product.image}" class="card-img-top" style="max-height: 300px; object-fit: contain;">
+                    <div class="card-body">
+                        <h2 class="card-title">${product.title}</h2>
+                        <p class="card-text lead">${product.description}</p>
+                        <div class="card-text">
+                            <h5>Подробности:</h5>
+                            <p>${product.details}</p>
+                        </div>
+                        <button id="back-btn" class="btn btn-sber mt-3">
+                            <i class="bi bi-arrow-left"></i> Назад к предложениям
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            this.render();
+        });
+    }
 }

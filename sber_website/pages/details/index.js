@@ -3,6 +3,7 @@ export class DetailsPage {
         this.data = data;
         this.backCallback = backCallback;
         this.root = document.getElementById('app');
+        
     }
 
     render() {
