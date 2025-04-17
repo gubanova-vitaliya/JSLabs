@@ -37,7 +37,6 @@ export class MainPage {
         ];
     }
 
-    // 1. Функция анализа повторяющихся операций
     countIdentic(arr, key) {
         const counts = {};
         arr.forEach(item => counts[item[key]] = (counts[item[key]] || 0) + 1);
@@ -46,18 +45,15 @@ export class MainPage {
                    .map(([category, count]) => `${category}: ${count} раза`);
     }
 
-    // 2. Среднее арифметическое
     calculateAverage(arr, key) {
         const sum = arr.reduce((acc, item) => acc + item[key], 0);
         return (sum / arr.length).toFixed(2);
     }
 
-    // 3. Максимальная последовательность 1
     maxSuccessSequence(logs) {
         return Math.max(...logs.split('0').map(s => s.length));
     }
 
-    // 4. Проверка палиндрома (2 варианта)
     isPalindrome(input) {
         const str = String(input).replace(/\s/g, '');
         return str === str.split('').reverse().join('');
@@ -149,16 +145,13 @@ export class MainPage {
     }
 
     renderAnalytics() {
-        // 1. Повторяющиеся операции
         const repeats = this.countIdentic(this.transactions, 'category');
         document.getElementById('repeat-transactions').innerHTML = 
             repeats.length ? repeats.join('<br>') : 'Нет повторяющихся операций';
         
-        // 2. Средний чек
         const avgCheck = this.calculateAverage(this.transactions, 'amount');
         document.getElementById('average-check').textContent = `${avgCheck} ₽`;
         
-        // 3. Последовательные входы
         const maxStreak = this.maxSuccessSequence(this.loginHistory);
         document.getElementById('login-streak').innerHTML = `
             <span class="badge bg-success">Рекорд: ${maxStreak}</span>
@@ -166,40 +159,23 @@ export class MainPage {
     }
 
     setupEventListeners() {
-        // Добавление продукта
         document.getElementById('add-product-btn').addEventListener('click', () => {
             if (this.products.length === 0) return;
             
             const lastProduct = this.products[this.products.length - 1];
             const newProduct = {
                 ...lastProduct,
-                id: this.products.length + 1,
+                id: Date.now(),
                 title: `${lastProduct.title} (копия)`
             };
             
             this.products.push(newProduct);
             this.renderProducts();
+            this.setupDynamicEventListeners();
         });
 
-        // Удаление продукта
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const productId = parseInt(e.target.dataset.id);
-                this.products = this.products.filter(p => p.id !== productId);
-                document.getElementById(`product-${productId}`).remove();
-            });
-        });
+        this.setupDynamicEventListeners();
 
-        // Подробнее о продукте
-        document.querySelectorAll('.details-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const productId = parseInt(e.target.dataset.id);
-                const product = this.products.find(p => p.id === productId);
-                this.showProductDetails(product);
-            });
-        });
-
-        // Проверка палиндрома
         document.getElementById('check-palindrome-btn').addEventListener('click', () => {
             const cardNumber = document.getElementById('card-number-input').value.replace(/\s/g, '');
             const resultDiv = document.getElementById('palindrome-result');
@@ -227,7 +203,34 @@ export class MainPage {
         });
     }
 
-    showProductDetails(product) {
+    setupDynamicEventListeners() {
+        document.getElementById('products-container').addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+                const button = e.target.classList.contains('delete-btn') ? e.target : e.target.closest('.delete-btn');
+                const productId = parseInt(button.dataset.id);
+                this.deleteProduct(productId);
+            }
+            
+            if (e.target.classList.contains('details-btn') || e.target.closest('.details-btn')) {
+                const button = e.target.classList.contains('details-btn') ? e.target : e.target.closest('.details-btn');
+                const productId = parseInt(button.dataset.id);
+                this.showProductDetails(productId);
+            }
+        });
+    }
+
+    deleteProduct(productId) {
+        this.products = this.products.filter(p => p.id !== productId);
+        const productElement = document.getElementById(`product-${productId}`);
+        if (productElement) {
+            productElement.remove();
+        }
+    }
+
+    showProductDetails(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product) return;
+        
         this.root.innerHTML = `
             <div class="details-page">
                 <div class="card border-0">
