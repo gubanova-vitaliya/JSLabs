@@ -23,7 +23,6 @@ export class MainPage {
                 image: "https://cdn-icons-png.flaticon.com/512/2553/2553629.png", // НОВАЯ КАРТИНКА
                 details: "Условия получения максимального кэшбэка"
             },
-            // НОВЫЕ КАРТОЧКИ
             {
                 id: 3,
                 title: "Инвестиции",
