@@ -1,13 +1,13 @@
 export class MainPage {
     constructor() {
         this.root = document.getElementById('app');
-        this.products = this.getProducts();
+        this.products = this.getSberCards();
         this.transactions = this.getDemoTransactions();
         this.loginHistory = '110111011111101110';
         this.render();
     }
 
-    getProducts() {
+    getSberCards() {
         return [
             {
                 id: 1,
