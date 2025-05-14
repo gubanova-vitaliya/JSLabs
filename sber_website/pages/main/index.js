@@ -20,7 +20,7 @@ export class MainPage {
                 id: 2,
                 title: "Кэшбэк до 30%",
                 description: "Вернем деньги за покупки",
-                image: "https://cdn-icons-png.flaticon.com/512/2553/2553629.png", // НОВАЯ КАРТИНКА
+                image: "https://cdn-icons-png.flaticon.com/512/2553/2553629.png",
                 details: "Условия получения максимального кэшбэка"
             },
             {
@@ -39,6 +39,7 @@ export class MainPage {
             }
         ];
     }
+
     getDemoTransactions() {
         return [
             {category: "Кафе", amount: 500},
@@ -59,11 +60,13 @@ export class MainPage {
     }
 
     calculateAverage(arr, key) {
+        if (arr.length === 0) return 0;
         const sum = arr.reduce((acc, item) => acc + item[key], 0);
         return (sum / arr.length).toFixed(2);
     }
 
     maxSuccessSequence(logs) {
+        if (!logs) return 0;
         return Math.max(...logs.split('0').map(s => s.length));
     }
 
@@ -91,19 +94,38 @@ export class MainPage {
                     <div class="analytics-card">
                         <h5><i class="bi bi-repeat"></i> Повторяющиеся расходы</h5>
                         <div id="repeat-transactions" class="my-2"></div>
-                        <small class="text-muted">Анализ последних операций</small>
+                        <div class="input-group mb-2">
+                            <input type="text" id="new-transaction-category" class="form-control" 
+                                   placeholder="Категория">
+                            <input type="number" id="new-transaction-amount" class="form-control" 
+                                   placeholder="Сумма">
+                            <button id="add-transaction-btn" class="btn btn-light">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Добавьте новые транзакции</small>
                     </div>
                     
                     <div class="analytics-card">
                         <h5><i class="bi bi-calculator"></i> Средний чек</h5>
                         <div id="average-check" class="my-2"></div>
+                        <button id="reset-transactions-btn" class="btn btn-sm btn-outline-light">
+                            Сбросить транзакции
+                        </button>
                         <small class="text-muted">По всем категориям</small>
                     </div>
                     
                     <div class="analytics-card">
                         <h5><i class="bi bi-shield-lock"></i> Активность</h5>
                         <div id="login-streak" class="my-2"></div>
-                        <small class="text-muted">Последовательные входы</small>
+                        <div class="input-group mb-2">
+                            <input type="text" id="login-history-input" class="form-control" 
+                                   value="${this.loginHistory}" placeholder="История входов (1/0)">
+                            <button id="update-login-btn" class="btn btn-light">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">1 - успешный вход, 0 - пропущенный день</small>
                     </div>
                     
                     <div class="palindrome-checker mt-3">
@@ -158,20 +180,28 @@ export class MainPage {
     }
 
     renderAnalytics() {
+        // Повторяющиеся расходы
         const repeats = this.countIdentic(this.transactions, 'category');
         document.getElementById('repeat-transactions').innerHTML = 
             repeats.length ? repeats.join('<br>') : 'Нет повторяющихся операций';
         
+        // Средний чек
         const avgCheck = this.calculateAverage(this.transactions, 'amount');
-        document.getElementById('average-check').textContent = `${avgCheck} ₽`;
+        document.getElementById('average-check').innerHTML = `
+            <span class="badge bg-primary">${avgCheck} ₽</span>
+            <small>из ${this.transactions.length} транзакций</small>
+        `;
         
+        // Последовательные входы
         const maxStreak = this.maxSuccessSequence(this.loginHistory);
         document.getElementById('login-streak').innerHTML = `
             <span class="badge bg-success">Рекорд: ${maxStreak}</span>
+            <small>текущая серия: ${this.loginHistory.split('0').pop().length}</small>
         `;
     }
 
     setupEventListeners() {
+        // Добавление продукта
         document.getElementById('add-product-btn').addEventListener('click', () => {
             if (this.products.length === 0) return;
             
@@ -187,8 +217,41 @@ export class MainPage {
             this.setupDynamicEventListeners();
         });
 
-        this.setupDynamicEventListeners();
+        // Добавление транзакции
+        document.getElementById('add-transaction-btn').addEventListener('click', () => {
+            const categoryInput = document.getElementById('new-transaction-category');
+            const amountInput = document.getElementById('new-transaction-amount');
+            
+            if (!categoryInput.value || !amountInput.value) return;
+            
+            this.transactions.push({
+                category: categoryInput.value,
+                amount: parseFloat(amountInput.value)
+            });
+            
+            categoryInput.value = '';
+            amountInput.value = '';
+            this.renderAnalytics();
+        });
 
+        // Сброс транзакций
+        document.getElementById('reset-transactions-btn').addEventListener('click', () => {
+            this.transactions = this.getDemoTransactions();
+            this.renderAnalytics();
+        });
+
+        // Обновление истории входов
+        document.getElementById('update-login-btn').addEventListener('click', () => {
+            const input = document.getElementById('login-history-input');
+            if (/^[01]+$/.test(input.value)) {
+                this.loginHistory = input.value;
+                this.renderAnalytics();
+            } else {
+                alert('Введите только 0 и 1 (0 - пропущенный день, 1 - успешный вход)');
+            }
+        });
+
+        // Проверка палиндрома
         document.getElementById('check-palindrome-btn').addEventListener('click', () => {
             const cardNumber = document.getElementById('card-number-input').value.replace(/\s/g, '');
             const resultDiv = document.getElementById('palindrome-result');
@@ -206,7 +269,7 @@ export class MainPage {
                     является палиндромом! <br>
                     <a href="#" class="alert-link text-white">Узнайте о специальных условиях</a>
                 `;
-                resultDiv.className = 'alert alert-light';
+                resultDiv.className = 'alert alert-success';
             } else {
                 resultDiv.textContent = `Номер ${cardNumber} не является палиндромом`;
                 resultDiv.className = 'alert alert-light';
@@ -214,6 +277,8 @@ export class MainPage {
             
             resultDiv.style.display = 'block';
         });
+
+        this.setupDynamicEventListeners();
     }
 
     setupDynamicEventListeners() {
